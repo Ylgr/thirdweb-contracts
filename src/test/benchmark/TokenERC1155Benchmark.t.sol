@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-import { TokenERC1155, IPlatformFee } from "contracts/token/TokenERC1155.sol";
+import { TokenERC1155, IPlatformFee } from "contracts/prebuilts/token/TokenERC1155.sol";
 
 // Test imports
 import "contracts/lib/TWStrings.sol";
@@ -169,7 +169,6 @@ contract TokenERC1155BenchmarkTest is BaseTest {
         uint256 _amount = 100;
 
         uint256 nextTokenId = tokenContract.nextTokenIdToMint();
-        uint256 currentBalanceOfRecipient = tokenContract.balanceOf(recipient, nextTokenId);
 
         vm.prank(deployerSigner);
         tokenContract.mintTo(recipient, type(uint256).max, _tokenURI, _amount);

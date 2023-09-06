@@ -8,7 +8,6 @@ import "hardhat-gas-reporter";
 import "@primitivefi/hardhat-dodoc";
 import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
-import '@openzeppelin/hardhat-upgrades';
 
 dotenv.config();
 

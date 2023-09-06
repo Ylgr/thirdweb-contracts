@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-import { PackVRFDirect, IERC2981Upgradeable, IERC721Receiver, IERC1155Upgradeable } from "contracts/pack/PackVRFDirect.sol";
-import { IPack } from "contracts/interfaces/IPack.sol";
+import { PackVRFDirect, IERC2981Upgradeable, IERC721Receiver, IERC1155Upgradeable } from "contracts/prebuilts/pack/PackVRFDirect.sol";
+import { IPack } from "contracts/prebuilts/interface/IPack.sol";
 import { ITokenBundle } from "contracts/extension/interface/ITokenBundle.sol";
 
 // Test imports
@@ -183,7 +183,7 @@ contract PackVRFDirectTest is BaseTest {
                         Unit tests: `createPack`
     //////////////////////////////////////////////////////////////*/
 
-    function test_interface() public view {
+    function test_interface() public pure {
         console2.logBytes4(type(IERC20).interfaceId);
         console2.logBytes4(type(IERC721).interfaceId);
         console2.logBytes4(type(IERC1155).interfaceId);
@@ -534,7 +534,7 @@ contract PackVRFDirectTest is BaseTest {
         address recipient = address(1);
 
         vm.prank(address(tokenOwner));
-        (, uint256 totalSupply) = pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
+        pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
 
         vm.prank(recipient, recipient);
         uint256 requestId = pack.openPackAndClaimRewards(packId, packsToOpen, 2_500_000);
@@ -564,7 +564,7 @@ contract PackVRFDirectTest is BaseTest {
         address recipient = address(1);
 
         vm.prank(address(tokenOwner));
-        (, uint256 totalSupply) = pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
+        pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
 
         vm.prank(recipient, recipient);
         uint256 requestId = pack.openPackAndClaimRewards(packId, packsToOpen, 2);
@@ -596,7 +596,7 @@ contract PackVRFDirectTest is BaseTest {
         address recipient = address(1);
 
         vm.prank(address(tokenOwner));
-        (, uint256 totalSupply) = pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
+        pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
 
         vm.prank(recipient, recipient);
         uint256 requestId = pack.openPackAndClaimRewards(packId, packsToOpen, 2_500_000);
@@ -797,7 +797,7 @@ contract PackVRFDirectTest is BaseTest {
         address recipient = address(1);
 
         vm.prank(address(tokenOwner));
-        (, uint256 totalSupply) = pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
+        pack.createPack(packContents, numOfRewardUnits, packUri, 0, 2, recipient);
 
         vm.prank(recipient, recipient);
         uint256 requestId = pack.openPack(packId, packsToOpen);

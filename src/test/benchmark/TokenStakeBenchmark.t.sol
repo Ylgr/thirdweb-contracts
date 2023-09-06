@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-import { TokenStake } from "contracts/staking/TokenStake.sol";
+import { TokenStake } from "contracts/prebuilts/staking/TokenStake.sol";
 
 // Test imports
 import "contracts/lib/TWStrings.sol";
@@ -70,13 +70,10 @@ contract TokenStakeBenchmarkTest is BaseTest {
         // stake 50 tokens with token-id 0
         vm.prank(stakerOne);
         stakeContract.stake(400);
-        uint256 timeOfLastUpdate_one = block.timestamp;
 
         //=================== warp timestamp to claim rewards
         vm.roll(100);
         vm.warp(1000);
-
-        uint256 rewardBalanceBefore = stakeContract.getRewardTokenBalance();
         vm.prank(stakerOne);
         vm.resumeGasMetering();
         stakeContract.claimRewards();
@@ -91,8 +88,6 @@ contract TokenStakeBenchmarkTest is BaseTest {
 
         vm.prank(stakerTwo);
         stakeContract.stake(200);
-
-        uint256 timeOfLastUpdate = block.timestamp;
 
         //========== warp timestamp before withdraw
         vm.roll(100);

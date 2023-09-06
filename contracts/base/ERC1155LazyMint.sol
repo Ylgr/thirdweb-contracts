@@ -15,7 +15,7 @@ import "../extension/interface/IClaimableERC1155.sol";
 import "../extension/DefaultOperatorFilterer.sol";
 
 import "../lib/TWStrings.sol";
-import "../openzeppelin-presets/security/ReentrancyGuard.sol";
+import "../external-deps/openzeppelin/security/ReentrancyGuard.sol";
 
 /**
  *      BASE:      ERC1155Base
@@ -78,12 +78,13 @@ contract ERC1155LazyMint is
     //////////////////////////////////////////////////////////////*/
 
     constructor(
+        address _defaultAdmin,
         string memory _name,
         string memory _symbol,
         address _royaltyRecipient,
         uint128 _royaltyBps
     ) ERC1155(_name, _symbol) {
-        _setupOwner(msg.sender);
+        _setupOwner(_defaultAdmin);
         _setupDefaultRoyaltyInfo(_royaltyRecipient, _royaltyBps);
         _setOperatorRestriction(true);
     }

@@ -3,13 +3,14 @@ pragma solidity ^0.8.0;
 
 /// @author thirdweb
 
-import "../openzeppelin-presets/token/ERC20/extensions/ERC20Permit.sol";
+import "../external-deps/openzeppelin/token/ERC20/extensions/ERC20Permit.sol";
 
 import "../extension/ContractMetadata.sol";
 import "../extension/Multicall.sol";
 import "../extension/Ownable.sol";
 import "../extension/PrimarySale.sol";
 import "../extension/DropSinglePhase.sol";
+import "../extension/interface/IBurnableERC20.sol";
 
 import "../lib/CurrencyTransferLib.sol";
 
@@ -33,17 +34,18 @@ import "../lib/CurrencyTransferLib.sol";
  *
  */
 
-contract ERC20Drop is ContractMetadata, Multicall, Ownable, ERC20Permit, PrimarySale, DropSinglePhase {
+contract ERC20Drop is ContractMetadata, Multicall, Ownable, ERC20Permit, PrimarySale, DropSinglePhase, IBurnableERC20 {
     /*//////////////////////////////////////////////////////////////
                             Constructor
     //////////////////////////////////////////////////////////////*/
 
     constructor(
+        address _defaultAdmin,
         string memory _name,
         string memory _symbol,
         address _primarySaleRecipient
     ) ERC20Permit(_name, _symbol) {
-        _setupOwner(msg.sender);
+        _setupOwner(_defaultAdmin);
         _setupPrimarySaleRecipient(_primarySaleRecipient);
     }
 
@@ -62,6 +64,22 @@ contract ERC20Drop is ContractMetadata, Multicall, Ownable, ERC20Permit, Primary
         _burn(msg.sender, _amount);
     }
 
+    /**
+     *  @notice          Lets an owner burn a given amount of an account's tokens.
+     *  @dev             `_account` should own the `_amount` of tokens.
+     *
+     *  @param _account  The account to burn tokens from.
+     *  @param _amount   The number of tokens to burn.
+     */
+    function burnFrom(address _account, uint256 _amount) external virtual override {
+        require(_canBurn(), "Not authorized to burn.");
+        require(balanceOf(_account) >= _amount, "not enough balance");
+        uint256 decreasedAllowance = allowance(_account, msg.sender) - _amount;
+        _approve(_account, msg.sender, 0);
+        _approve(_account, msg.sender, decreasedAllowance);
+        _burn(_account, _amount);
+    }
+
     /*//////////////////////////////////////////////////////////////
                         Internal (overrideable) functions
     //////////////////////////////////////////////////////////////*/
@@ -74,15 +92,20 @@ contract ERC20Drop is ContractMetadata, Multicall, Ownable, ERC20Permit, Primary
         uint256 _pricePerToken
     ) internal virtual override {
         if (_pricePerToken == 0) {
+            require(msg.value == 0, "!Value");
             return;
         }
 
         uint256 totalPrice = (_quantityToClaim * _pricePerToken) / 1 ether;
         require(totalPrice > 0, "quantity too low");
 
+        bool validMsgValue;
         if (_currency == CurrencyTransferLib.NATIVE_TOKEN) {
-            require(msg.value == totalPrice, "Must send total price.");
+            validMsgValue = msg.value == totalPrice;
+        } else {
+            validMsgValue = msg.value == 0;
         }
+        require(validMsgValue, "Invalid msg value");
 
         address saleRecipient = _primarySaleRecipient == address(0) ? primarySaleRecipient() : _primarySaleRecipient;
         CurrencyTransferLib.transferCurrency(_currency, msg.sender, saleRecipient, totalPrice);
@@ -111,6 +134,11 @@ contract ERC20Drop is ContractMetadata, Multicall, Ownable, ERC20Permit, Primary
 
     /// @dev Returns whether tokens can be minted in the given execution context.
     function _canMint() internal view virtual returns (bool) {
+        return msg.sender == owner();
+    }
+
+    /// @dev Returns whether tokens can be burned in the given execution context.
+    function _canBurn() internal view virtual returns (bool) {
         return msg.sender == owner();
     }
 

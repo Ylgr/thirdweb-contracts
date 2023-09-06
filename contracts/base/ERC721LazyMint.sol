@@ -15,7 +15,7 @@ import "../extension/interface/IClaimableERC721.sol";
 import "../extension/DefaultOperatorFilterer.sol";
 
 import "../lib/TWStrings.sol";
-import "../openzeppelin-presets/security/ReentrancyGuard.sol";
+import "../external-deps/openzeppelin/security/ReentrancyGuard.sol";
 
 /**
  *      BASE:      ERC721A
@@ -62,12 +62,13 @@ contract ERC721LazyMint is
     //////////////////////////////////////////////////////////////*/
 
     constructor(
+        address _defaultAdmin,
         string memory _name,
         string memory _symbol,
         address _royaltyRecipient,
         uint128 _royaltyBps
     ) ERC721A(_name, _symbol) {
-        _setupOwner(msg.sender);
+        _setupOwner(_defaultAdmin);
         _setupDefaultRoyaltyInfo(_royaltyRecipient, _royaltyBps);
         _setOperatorRestriction(true);
     }

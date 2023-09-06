@@ -3,8 +3,8 @@ pragma solidity ^0.8.11;
 
 // Test imports
 import "./utils/BaseTest.sol";
-import "contracts/interfaces/ITWMultichainRegistry.sol";
-import "contracts/TWMultichainRegistry.sol";
+import "contracts/infra/interface/ITWMultichainRegistry.sol";
+import "contracts/infra/TWMultichainRegistry.sol";
 import "./mocks/MockThirdwebContract.sol";
 import "contracts/extension/interface/plugin/IPluginMap.sol";
 
@@ -51,7 +51,7 @@ contract TWMultichainRegistryTest is ITWMultichainRegistryData, BaseTest {
         vm.stopPrank();
     }
 
-    function test_interfaceId() public view {
+    function test_interfaceId() public pure {
         console2.logBytes4(type(IPluginMap).interfaceId);
     }
 

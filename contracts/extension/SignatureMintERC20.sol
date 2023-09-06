@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 /// @author thirdweb
 
 import "./interface/ISignatureMintERC20.sol";
-import "../openzeppelin-presets/utils/cryptography/EIP712.sol";
+import "../external-deps/openzeppelin/utils/cryptography/EIP712.sol";
 
 abstract contract SignatureMintERC20 is EIP712, ISignatureMintERC20 {
     using ECDSA for bytes32;
 
     bytes32 private constant TYPEHASH =
         keccak256(
-            "MintRequest(address to,address primarySaleRecipient,uint256 quantity,uint256 pricePerToken,address currency,uint128 validityStartTimestamp,uint128 validityEndTimestamp,bytes32 uid)"
+            "MintRequest(address to,address primarySaleRecipient,uint256 quantity,uint256 price,address currency,uint128 validityStartTimestamp,uint128 validityEndTimestamp,bytes32 uid)"
         );
 
     /// @dev Mapping from mint request UID => whether the mint request is processed.
@@ -62,7 +62,7 @@ abstract contract SignatureMintERC20 is EIP712, ISignatureMintERC20 {
                 _req.to,
                 _req.primarySaleRecipient,
                 _req.quantity,
-                _req.pricePerToken,
+                _req.price,
                 _req.currency,
                 _req.validityStartTimestamp,
                 _req.validityEndTimestamp,

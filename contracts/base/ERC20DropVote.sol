@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 /// @author thirdweb
 
-import "../openzeppelin-presets/token/ERC20/extensions/ERC20Votes.sol";
+import "../external-deps/openzeppelin/token/ERC20/extensions/ERC20Votes.sol";
 
 import "../extension/ContractMetadata.sol";
 import "../extension/Multicall.sol";
@@ -39,11 +39,12 @@ contract ERC20DropVote is ContractMetadata, Multicall, Ownable, ERC20Votes, Prim
     //////////////////////////////////////////////////////////////*/
 
     constructor(
+        address _defaultAdmin,
         string memory _name,
         string memory _symbol,
         address _primarySaleRecipient
     ) ERC20Permit(_name, _symbol) {
-        _setupOwner(msg.sender);
+        _setupOwner(_defaultAdmin);
         _setupPrimarySaleRecipient(_primarySaleRecipient);
     }
 
@@ -74,15 +75,20 @@ contract ERC20DropVote is ContractMetadata, Multicall, Ownable, ERC20Votes, Prim
         uint256 _pricePerToken
     ) internal virtual override {
         if (_pricePerToken == 0) {
+            require(msg.value == 0, "!Value");
             return;
         }
 
         uint256 totalPrice = (_quantityToClaim * _pricePerToken) / 1 ether;
         require(totalPrice > 0, "quantity too low");
 
+        bool validMsgValue;
         if (_currency == CurrencyTransferLib.NATIVE_TOKEN) {
-            require(msg.value == totalPrice, "Must send total price.");
+            validMsgValue = msg.value == totalPrice;
+        } else {
+            validMsgValue = msg.value == 0;
         }
+        require(validMsgValue, "Invalid msg value");
 
         address saleRecipient = _primarySaleRecipient == address(0) ? primarySaleRecipient() : _primarySaleRecipient;
         CurrencyTransferLib.transferCurrency(_currency, msg.sender, saleRecipient, totalPrice);

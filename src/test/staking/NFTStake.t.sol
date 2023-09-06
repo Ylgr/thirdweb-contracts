@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-import { NFTStake } from "contracts/staking/NFTStake.sol";
+import { NFTStake } from "contracts/prebuilts/staking/NFTStake.sol";
 
 // Test imports
 import "contracts/lib/TWStrings.sol";
@@ -151,7 +151,7 @@ contract NFTStakeTest is BaseTest {
         _tokenIds[0] = 6;
 
         vm.prank(stakerOne);
-        vm.expectRevert("Not owned or approved");
+        vm.expectRevert("ERC721: transfer from incorrect owner");
         stakeContract.stake(_tokenIds);
     }
 
