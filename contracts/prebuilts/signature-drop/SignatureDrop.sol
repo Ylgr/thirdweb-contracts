@@ -28,9 +28,9 @@ import "../../lib/CurrencyTransferLib.sol";
 //  ==========  Features    ==========
 
 import "../../extension/ContractMetadata.sol";
-import "../../extension/PlatformFee.sol";
+import "../../legacy-contracts/extension/PlatformFee_V1.sol";
 import "../../extension/Royalty.sol";
-import "../../extension/PrimarySale.sol";
+import "../../legacy-contracts/extension/PrimarySale_V1.sol";
 import "../../extension/Ownable.sol";
 import "../../extension/DelayedReveal.sol";
 import "../../extension/LazyMint.sol";
@@ -72,7 +72,7 @@ contract SignatureDrop is
                     Constructor + initializer logic
     //////////////////////////////////////////////////////////////*/
 
-    /// @dev Initiliazes the contract, like a constructor.
+    /// @dev Initializes the contract, like a constructor.
     function initialize(
         address _defaultAdmin,
         string memory _name,

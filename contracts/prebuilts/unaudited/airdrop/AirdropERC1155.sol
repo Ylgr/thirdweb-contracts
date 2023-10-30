@@ -49,7 +49,7 @@ contract AirdropERC1155 is
 
     constructor() initializer {}
 
-    /// @dev Initiliazes the contract, like a constructor.
+    /// @dev Initializes the contract, like a constructor.
     function initialize(
         address _defaultAdmin,
         string memory _contractURI,
@@ -86,10 +86,10 @@ contract AirdropERC1155 is
      *                   which acts as operator for the tokens.
      *
      *  @param _tokenAddress    The contract address of the tokens to transfer.
-     *  @param _tokenOwner      The owner of the the tokens to transfer.
+     *  @param _tokenOwner      The owner of the tokens to transfer.
      *  @param _contents        List containing recipient, tokenId and amounts to airdrop.
      */
-    function airdrop(
+    function airdropERC1155(
         address _tokenAddress,
         address _tokenOwner,
         AirdropContent[] calldata _contents

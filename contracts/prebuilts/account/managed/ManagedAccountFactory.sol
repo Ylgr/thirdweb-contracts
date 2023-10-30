@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 // Utils
-import "@thirdweb-dev/dynamic-contracts/src/presets/BaseRouterWithDefaults.sol";
+import "@thirdweb-dev/dynamic-contracts/src/presets/BaseRouter.sol";
 import "../utils/BaseAccountFactory.sol";
 
 // Extensions
@@ -21,20 +21,25 @@ import { ManagedAccount, IEntryPoint } from "./ManagedAccount.sol";
 //   \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
 //    \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/
 
-contract ManagedAccountFactory is BaseAccountFactory, ContractMetadata, PermissionsEnumerable, BaseRouterWithDefaults {
+contract ManagedAccountFactory is BaseAccountFactory, ContractMetadata, PermissionsEnumerable, BaseRouter {
     /*///////////////////////////////////////////////////////////////
                             Constructor
     //////////////////////////////////////////////////////////////*/
 
-    constructor(IEntryPoint _entrypoint, Extension[] memory _defaultExtensions)
-        BaseRouterWithDefaults(_defaultExtensions)
+    constructor(
+        address _defaultAdmin,
+        IEntryPoint _entrypoint,
+        Extension[] memory _defaultExtensions
+    )
+        BaseRouter(_defaultExtensions)
         BaseAccountFactory(payable(address(new ManagedAccount(_entrypoint, address(this)))), address(_entrypoint))
     {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
+        __BaseRouter_init();
+        _setupRole(DEFAULT_ADMIN_ROLE, _defaultAdmin);
 
-    receive() external payable {
-        revert("Cannot accept ether.");
+        bytes32 _extensionRole = keccak256("EXTENSION_ROLE");
+        _setupRole(_extensionRole, _defaultAdmin);
+        _setRoleAdmin(_extensionRole, _extensionRole);
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -51,8 +56,8 @@ contract ManagedAccountFactory is BaseAccountFactory, ContractMetadata, Permissi
     }
 
     /// @dev Returns whether all relevant permission and other checks are met before any upgrade.
-    function isAuthorizedCallToUpgrade() internal view virtual override returns (bool) {
-        return hasRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    function _isAuthorizedCallToUpgrade() internal view virtual override returns (bool) {
+        return hasRole(keccak256("EXTENSION_ROLE"), msg.sender);
     }
 
     /// @dev Returns whether contract metadata can be set in the given execution context.
